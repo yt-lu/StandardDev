@@ -16,7 +16,7 @@ shinyUI(fluidPage(
                     "))
   ), 
   # Application title
-  titlePanel("A Quiz with 10 T/F Questions"),
+  titlePanel("Class Survey"),
   
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
