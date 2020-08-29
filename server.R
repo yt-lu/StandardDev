@@ -16,7 +16,9 @@ shinyServer(function(input, output, session) {
                 col.names = FALSE)
       shinyalert(title = "Your data has been submitted.", 
                  type = "success")
-      
+      updateNumericInput(session, "temp", "Body temperature:", value = NA)
+      updateNumericInput(session, "rate", "Heart rate:", value = NA)
+      updateNumericInput(session, "hours", "Semester credit hours:", value = NA)
     }
       
   })
@@ -28,8 +30,27 @@ shinyServer(function(input, output, session) {
   })
   
   output$text <- renderText({
-    out <- paste(userdata())
+    out <- paste0("<ul>", 
+                  "<li><strong>Body temperature:</strong> ", 
+                  paste(userdata()[, 1], collapse = ", "), "</li>",
+                  "<li><strong>Heart rates</strong>: ", 
+                  paste(userdata()[, 2], collapse = ", "), "</li>",
+                  "<li><strong>Credit hours</strong>: ", 
+                  paste(userdata()[, 3], collapse = ", "), "</li>",
+                  "</ul>")
     out
+  })
+  
+  output$graph <- renderPlot({
+    if (nrow(userdata()) > 0) {
+      boxplot(userdata(), 
+              at = c(1, 3, 5), names = c("Body\nTemp", "Heart\nRates", "Credit\nHours"), 
+              las = 2, horizontal = TRUE, xaxt = 'n')
+      axis(1, las = 1)
+    } else {
+      plot.new()
+    }
+    title(main = "Class Survey Results")
   })
   
   observeEvent(input$reset, {
@@ -38,8 +59,8 @@ shinyServer(function(input, output, session) {
       msg_new_game, type = "input", html = TRUE,
       callbackR = function(x) { if(x == 'GoBears') {
           close( file( 'report.csv', open="w" ) )
-          write.table("", 'report.csv', row.names = FALSE, col.names = 'Quiz', 
-                quote = FALSE, sep = ",")}
+          write.table(data.frame(BodyTemp = NA, HeartRate = NA, CreditHours = NA),
+                      'report.csv', row.names = F, quote = F, sep = ',')}
         })
     })
   
